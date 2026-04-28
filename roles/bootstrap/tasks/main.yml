@@ -1,0 +1,4 @@
+# roles/bootstrap/tasks/main.yml
+- name: Deploy root app
+  shell: |
+    kubectl apply -f https://your-git-repo/root-app.yaml

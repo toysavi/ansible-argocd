@@ -1,0 +1,62 @@
+# roles/argocd/tasks/main.yml
+- name: Create namespace
+  shell: kubectl create namespace argocd || true
+
+- name: Install ArgoCD
+  shell: |
+    kubectl apply -n argocd \
+    -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
+
+- name: Configure external Redis
+  shell: |
+    kubectl patch configmap argocd-cmd-params-cm -n argocd \
+    --type merge \
+    -p '{"data":{"redis.server":"argocd-redis-master:6379"}}'
+
+- name: Configure Dex SSO
+  copy:
+    dest: /tmp/argocd-cm.yaml
+    content: |
+      apiVersion: v1
+      kind: ConfigMap
+      metadata:
+        name: argocd-cm
+        namespace: argocd
+      data:
+        url: https://{{ argocd_domain }}
+        dex.config: |
+          connectors:
+          - type: ldap
+            id: ldap
+            name: LDAP
+            config:
+              host: ldap.local:389
+
+- name: Apply Dex config
+  shell: kubectl apply -f /tmp/argocd-cm.yaml
+
+- name: Create Ingress
+  copy:
+    dest: /tmp/argocd-ingress.yaml
+    content: |
+      apiVersion: networking.k8s.io/v1
+      kind: Ingress
+      metadata:
+        name: argocd
+        namespace: argocd
+      spec:
+        rules:
+        - host: {{ argocd_domain }}
+          http:
+            paths:
+            - path: /
+              pathType: Prefix
+              backend:
+                service:
+                  name: argocd-server
+                  port:
+                    number: 80
+
+- name: Apply Ingress
+  shell: kubectl apply -f /tmp/argocd-ingress.yaml
+

@@ -1,0 +1,7 @@
+# group_vars/all.yml
+nfs_server: "192.168.103.50"
+nfs_path: "/exports/k3s"
+
+metallb_ip_range: "192.168.103.240-192.168.103.250"
+
+argocd_domain: "argocd.local"

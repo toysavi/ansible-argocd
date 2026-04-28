@@ -1,0 +1,13 @@
+# playbooks/site.yml
+- hosts: k3s_master
+  become: yes
+  roles:
+    - common
+    - k3s
+    - helm
+    - metallb
+    - traefik
+    - nfs
+    - redis
+    - argocd
+    - bootstrap

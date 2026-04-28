@@ -1,0 +1,8 @@
+# roles/common/tasks/main.yml
+- name: Install base packages
+  apt:
+    name:
+      - curl
+      - ca-certificates
+      - apt-transport-https
+    update_cache: yes

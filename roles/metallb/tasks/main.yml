@@ -1,0 +1,29 @@
+# roles/metallb/tasks/main.yml
+- name: Install MetalLB
+  shell: |
+    kubectl apply -f https://raw.githubusercontent.com/metallb/metallb/v0.14.5/config/manifests/metallb-native.yaml
+
+- name: Wait MetalLB ready
+  shell: kubectl wait -n metallb-system --for=condition=available deployment/controller --timeout=120s
+
+- name: Configure IP pool
+  copy:
+    dest: /tmp/metallb.yaml
+    content: |
+      apiVersion: metallb.io/v1beta1
+      kind: IPAddressPool
+      metadata:
+        name: pool
+        namespace: metallb-system
+      spec:
+        addresses:
+        - {{ metallb_ip_range }}
+      ---
+      apiVersion: metallb.io/v1beta1
+      kind: L2Advertisement
+      metadata:
+        name: l2
+        namespace: metallb-system
+
+- name: Apply MetalLB config
+  shell: kubectl apply -f /tmp/metallb.yaml

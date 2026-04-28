@@ -1,0 +1,5 @@
+# roles/traefik/tasks/main.yml
+- name: Patch Traefik service
+  shell: |
+    kubectl patch svc traefik -n kube-system \
+    -p '{"spec": {"type": "LoadBalancer"}}'

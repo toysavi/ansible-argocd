@@ -1,0 +1,9 @@
+# roles/redis/tasks/main.yml
+- name: Add Helm repo
+  shell: helm repo add bitnami https://charts.bitnami.com/bitnami
+
+- name: Install Redis HA
+  shell: |
+    helm install argocd-redis bitnami/redis \
+    --set architecture=replication \
+    --set auth.enabled=false
