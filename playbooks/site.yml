@@ -10,4 +10,5 @@
     - nfs
     - redis
     - argocd
+    - cert-manager 
     - bootstrap

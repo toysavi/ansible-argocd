@@ -1,0 +1,21 @@
+# roles/cert-manager/tasks/main.yml
+
+- name: Install cert-manager CRDs
+  shell: |
+    kubectl apply -f https://github.com/cert-manager/cert-manager/releases/latest/download/cert-manager.yaml
+
+- name: Wait for cert-manager to be ready
+  shell: |
+    kubectl wait --for=condition=available deployment \
+    -n cert-manager cert-manager --timeout=180s
+  ignore_errors: yes
+
+# roles/cert-manager/tasks/main.yml
+
+- name: Deploy ClusterIssuer
+  template:
+    src: clusterissuer.yaml.j2
+    dest: /tmp/clusterissuer.yaml
+
+- name: Apply ClusterIssuer
+  shell: kubectl apply -f /tmp/clusterissuer.yaml

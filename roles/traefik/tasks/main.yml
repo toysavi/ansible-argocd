@@ -3,3 +3,11 @@
   shell: |
     kubectl patch svc traefik -n kube-system \
     -p '{"spec": {"type": "LoadBalancer"}}'
+
+- name: Deploy ArgoCD TLS Ingress
+  template:
+    src: argocd-tls-ingress.yaml.j2
+    dest: /tmp/argocd-ingress.yaml
+
+- name: Apply ArgoCD Ingress
+  shell: kubectl apply -f /tmp/argocd-ingress.yaml
